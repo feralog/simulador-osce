@@ -1,0 +1,14 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# AI Studio scratch artifacts
+.aistudio/
+
+# PDFs de estudo enviados no AI Studio (nao referenciados pelo app)
+public/assets/aistudio/

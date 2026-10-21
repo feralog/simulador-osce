@@ -1,0 +1,7 @@
+{
+  "name": "Simulador Clínico OSCE - Emergência & TEC-5600",
+  "description": "Simulador de alta fidelidade para OSCE médica com monitor multiparamétrico, desfibrilador Nihon Kohden TEC-5600 interativo, traçados de ECG em tempo real e protocolos MOVE, OSASCO e PCR.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

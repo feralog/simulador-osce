@@ -1,0 +1,803 @@
+import type { ClinicalScenario, ScenarioPhase } from './types';
+
+export const SCENARIOS: ClinicalScenario[] = [
+  // ==========================================
+  // MEGACODE 1: Bradicardia Instável -> TVSP -> AESP -> RCE
+  // ==========================================
+  {
+    id: 'megacode-1',
+    title: 'Megacode 1: Bradicardia Instável a PCR (TV/FV) e RCE',
+    category: 'megacode',
+    description: 'Cenário clássico da OSCE: idoso com BAVT instável, colapso para TV sem pulso, transição para AESP e cuidados pós-parada.',
+    briefing: {
+      setting: 'Sala de Emergência / Sala Vermelha do Pronto-Socorro',
+      patientDescription: 'Homem, 68 anos, hipertenso e diabético, trazido pelo SAMU com queixa de tontura súbita, palidez e sudorese fria.',
+      initialComplaint: '"Doutor, minha vista está escurecendo e sinto um aperto no peito..."',
+      vitalSignsSummary: 'FC 32 bpm | PA 75/40 mmHg | SpO2 90% em ar ambiente | FR 24 rpm | Sonolento, tempo de enchimento capilar 4s.',
+    },
+    phases: [
+      {
+        id: 'mg1-p1',
+        phaseNumber: 1,
+        phaseName: 'Fase 1: Bradicardia Extrema com Instabilidade Hemodinâmica',
+        narrative: 'Paciente dá entrada trazido pela maca, confuso, pele pegajosa e descorada. Monitor cardíaco registra FC de 32 bpm. Você inicia o MOVE (Monitor, O2 se Sat<94%, Venóclise e Exames/ECG). Ao analisar o traçado de ECG em DII no monitor, nota-se ondas P regulares marchando a 85 bpm completamente dissociadas dos complexos QRS largos a 32 bpm.',
+        vitals: {
+          heartRate: 32,
+          systolicBP: 75,
+          diastolicBP: 40,
+          spO2: 91,
+          respiratoryRate: 24,
+          etCO2: 32,
+          consciousness: 'somnolent',
+          hasPulse: true,
+          chestPain: true,
+          dyspnea: true,
+          shockSigns: true,
+        },
+        rhythm: 'bav_3_bavt',
+        pacerThresholdMA: 65,
+        question: {
+          id: 'q-mg1-p1',
+          title: 'Diagnóstico Eletrocardiográfico e Conduta Imediata',
+          question: 'Observando o ritmo no monitor e os sinais clínicos do paciente, qual é o diagnóstico eletrocardiográfico e a conduta recomendada segundo as diretrizes de arritmias?',
+          options: [
+            {
+              id: 'a',
+              text: 'Bradicardia Sinusal estável; manter apenas observação clínica e repetir ECG.',
+              isCorrect: false,
+              feedback: 'Incorreto. A frequência é 32 bpm com dissociação AV completa e há múltiplos critérios de instabilidade hemodinâmica (PAS < 90, choque, RNC).',
+            },
+            {
+              id: 'b',
+              text: 'BAVT (Bloqueio Atrioventricular Total) instável; Atropina 1 mg é a primeira e definitiva linha curativa.',
+              isCorrect: false,
+              feedback: 'Incorreto! A Atropina atua no nó sinusal e nó AV proximal, sendo sabidamente ineficaz em bloqueios infranodais como o BAVT.',
+            },
+            {
+              id: 'c',
+              text: 'BAVT com instabilidade hemodinâmica; preparar de imediato Marca-passo Transcutâneo (ou Droga Vasoativa como Adrenalina/Dopamina) com analgesia.',
+              isCorrect: true,
+              feedback: 'Correto! Em BAVT com instabilidade (PAS < 90, choque, dor torácica), a Atropina é ineficaz. O preparo imediato de marca-passo transcutâneo (MP) no cardioversor TEC-5600 é a conduta prioritária.',
+            },
+            {
+              id: 'd',
+              text: 'Taquicardia ventricular; realizar cardioversão sincronizada com 100 Joules.',
+              isCorrect: false,
+              feedback: 'Incorreto. Trata-se de uma bradiarritmia grave (FC 32 bpm), não taquicardia.',
+            },
+          ],
+          explanation: 'No BAVT há dissociação atrioventricular total. Como o bloqueio é no feixe de His ou infranodal, a Atropina geralmente não tem efeito. Com critérios de instabilidade (PAS 75, sudorese, RNC), a indicação formal é Marca-passo Transcutâneo ou infusão de droga vasoativa (Epinefrina 2-10 mcg/min).',
+        },
+        targetActionHint: 'Ajuste o seletor do TEC-5600 para MARCAPASSO, regule a FC para 70 ppm e suba a corrente (mA) até haver captura!',
+      },
+      {
+        id: 'mg1-p2',
+        phaseNumber: 2,
+        phaseName: 'Fase 2: Colapso Súbito - Taquicardia Ventricular Sem Pulso (TVSP)',
+        narrative: 'Enquanto a equipe preparava os acessos, o paciente subitamente perde a consciência, para de responder e entra em respiração agônica (gasping). O monitor muda para um ritmo de complexos QRS largos e regulares a 210 bpm. Você checa o pulso carotídeo por 10 segundos: PULSO AUSENTE!',
+        vitals: {
+          heartRate: 210,
+          systolicBP: 0,
+          diastolicBP: 0,
+          spO2: 60,
+          respiratoryRate: 0,
+          etCO2: 10,
+          consciousness: 'unresponsive',
+          hasPulse: false,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: true,
+        },
+        rhythm: 'tv_monomorfica',
+        question: {
+          id: 'q-mg1-p2',
+          title: 'Reconhecimento de PCR e Choque Chocável',
+          question: 'O paciente está inconsciente, sem pulso e em ritmo de Taquicardia Ventricular monomórfica no monitor. Qual a conduta prioritária imediata?',
+          options: [
+            {
+              id: 'a',
+              text: 'Iniciar RCP de alta qualidade e realizar Desfibrilação com 200J (bifásico) NÃO SINCRONIZADA assim que o aparelho estiver pronto.',
+              isCorrect: true,
+              feedback: 'Excelente! TV sem pulso é ritmo de PCR CHOCÁVEL. O choque de desfibrilação deve ser NÃO SINCRONIZADO em carga máxima (200J bifásico no TEC-5600), seguido imediatamente de 2 minutos de RCP.',
+            },
+            {
+              id: 'b',
+              text: 'Ativar o botão SINC do cardioversor para sincronizar a cardioversão em 100J.',
+              isCorrect: false,
+              feedback: 'ERRO GRAVE NA OSCE: Paciente em parada cardiorrespiratória (sem pulso) NÃO recebe choque sincronizado! O aparelho pode atrasar ou não disparar por não reconhecer a onda R.',
+            },
+            {
+              id: 'c',
+              text: 'Administrar Atropina 1 mg e Epinefrina 1 mg antes de qualquer intervenção elétrica.',
+              isCorrect: false,
+              feedback: 'Incorreto. Em ritmos chocáveis (FV/TVSP), a prioridade absoluta é o choque precoce de desfibrilação!',
+            },
+            {
+              id: 'd',
+              text: 'Realizar intubação orotraqueal imediata antes de checar ou descarregar o desfibrilador.',
+              isCorrect: false,
+              feedback: 'Incorreto. A via aérea avançada nunca deve atrasar a desfibrilação precoce nem interromper as compressões torácicas.',
+            },
+          ],
+          explanation: 'TV sem pulso é tratada identicamente à Fibrilação Ventricular (ritmo chocável). Aplica-se 1 choque de 200J bifásico (NÃO sincronizado) e reinicia-se a RCP imediatamente por 2 minutos, sem checar pulso logo após o choque.',
+        },
+        targetActionHint: 'No TEC-5600, gire o seletor para 200J (sem SINC!), aperte CARGA e dispare o CHOQUE!',
+      },
+      {
+        id: 'mg1-p3',
+        phaseNumber: 3,
+        phaseName: 'Fase 3: Ritmo Não Chocável - Atividade Elétrica Sem Pulso (AESP)',
+        narrative: 'Após o 2º ciclo de RCP e a aplicação dos choques, você interrompe as compressões ao término dos 2 minutos para checar o ritmo. O monitor mostra traçado organizado com ritmo sinusal a 60 bpm. Você palpa o pulso carotídeo por 10 segundos: PULSO CONTINUA AUSENTE! Trata-se de AESP (Atividade Elétrica Sem Pulso).',
+        vitals: {
+          heartRate: 60,
+          systolicBP: 0,
+          diastolicBP: 0,
+          spO2: 65,
+          respiratoryRate: 0,
+          etCO2: 12,
+          consciousness: 'unresponsive',
+          hasPulse: false,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: true,
+        },
+        rhythm: 'aesp',
+        question: {
+          id: 'q-mg1-p3',
+          title: 'Conduta na AESP e Investigação de Causas Reversíveis',
+          question: 'Diante de um ritmo organizado no monitor em paciente sem pulso (AESP), qual a sequência correta de conduta?',
+          options: [
+            {
+              id: 'a',
+              text: 'Aplicar choque de desfibrilação com 200J e fazer Amiodarona 300 mg.',
+              isCorrect: false,
+              feedback: 'ERRO GRAVE: AESP é ritmo NÃO CHOCÁVEL! Choque em AESP não é indicado e atrasa as compressões torácicas.',
+            },
+            {
+              id: 'b',
+              text: 'Retomar RCP imediatamente por 2 min, administrar Epinefrina 1 mg IV a cada 3-5 min e buscar ativamente as causas reversíveis (5 Hs e 5 Ts).',
+              isCorrect: true,
+              feedback: 'Correto! Em ritmos não chocáveis (AESP e Assistolia), o pilar do tratamento é RCP contínua de qualidade, Epinefrina 1 mg precoce e tratamento da causa subjacente (especialmente Hipóxia e Hipovolemia).',
+            },
+            {
+              id: 'c',
+              text: 'Realizar protocolo CAGADA para checar se é assistolia mascarada.',
+              isCorrect: false,
+              feedback: 'Incorreto. O protocolo CAGADA é específico para linhas retas (Assistolia), não para ritmos organizados com ondas visíveis.',
+            },
+            {
+              id: 'd',
+              text: 'Suspender a RCP pois o paciente já recuperou o traçado eletrocardiográfico normal.',
+              isCorrect: false,
+              feedback: 'Incorreto. Na AESP há dissociação eletromecânica: existe eletricidade no ECG, mas o coração não contrai e não há pulso!',
+            },
+          ],
+          explanation: 'AESP tem como principais etiologias Hipóxia e Hipovolemia. Não deve ser chocada. A conduta é RCP contínua + Epinefrina 1 mg IV bolus + flush de 20 mL de soro + identificação e reversão dos 5 Hs e 5 Ts.',
+        },
+      },
+      {
+        id: 'mg1-p4',
+        phaseNumber: 4,
+        phaseName: 'Fase 4: Retorno da Circulação Espontânea (RCE / ROSC) & CPPCR',
+        narrative: 'Ao final do ciclo seguinte, enquanto o colega ventilava com oxigênio a 100% e expandia volume com SF 0,9%, a capnografia salta bruscamente de 12 para 42 mmHg! Você checa o pulso carotídeo: PULSO CENTRAL CHEIO E PALPÁVEL! A pressão arterial aferida é de 94/62 mmHg. RCE ALCANÇADO!',
+        vitals: {
+          heartRate: 78,
+          systolicBP: 94,
+          diastolicBP: 62,
+          spO2: 95,
+          respiratoryRate: 14,
+          etCO2: 42,
+          consciousness: 'somnolent',
+          hasPulse: true,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: false,
+        },
+        rhythm: 'sinus_normal',
+        question: {
+          id: 'q-mg1-p4',
+          title: 'Cuidados Pós-Parada Cardiorrespiratória (CPPCR)',
+          question: 'Com o paciente em RCE, quais são as metas imediatas dos Cuidados Pós-PCR estabelecidas no algoritmo?',
+          options: [
+            {
+              id: 'a',
+              text: 'Hiperventilar o paciente a 30 ventilações/min para manter etCO2 abaixo de 20 mmHg e induzir hipotensão controlada.',
+              isCorrect: false,
+              feedback: 'Incorreto. A hiperventilação diminui o retorno venoso e a perfusão cerebral. A meta é ventilar a 10/min mantendo PaCO2 35-45 mmHg.',
+            },
+            {
+              id: 'b',
+              text: 'Metas: SpO2 entre 92-98%, PAS > 90 mmHg (PAM > 65), solicitar ECG de 12 derivações e avaliar controle de temperatura (TTM) se comatoso.',
+              isCorrect: true,
+              feedback: 'Perfeito! As metas pós-parada incluem evitar hiperóxia (manter SpO2 92-98%), garantir perfusão coronária/cerebral (PAS > 90 mmHg), realizar ECG de 12 derivações para triagem de IAMST e neuroproteção.',
+            },
+            {
+              id: 'c',
+              text: 'Dar alta da UTI imediatamente se o traçado estiver sinusal.',
+              isCorrect: false,
+              feedback: 'Incorreto. Paciente pós-PCR requer vigilância intensiva contínua em UTI.',
+            },
+            {
+              id: 'd',
+              text: 'Administrar dose de ataque de Atropina 3 mg para evitar nova bradicardia.',
+              isCorrect: false,
+              feedback: 'Incorreto. Não se administra atropina profilática após RCE.',
+            },
+          ],
+          explanation: 'Fase de estabilização pós-PCR: controle respiratório (SpO2 92-98%, PaCO2 35-45 mmHg, 10 vent/min), controle hemodinâmico (PAS > 90, PAM > 65), ECG de 12 derivações para estratificar síndrome coronariana aguda e controle direcionado de temperatura.',
+        },
+      },
+    ],
+  },
+
+  // ==========================================
+  // MEGACODE 2: Taquicardia Instável -> CVE (OSASCO) -> FV -> RCE
+  // ==========================================
+  {
+    id: 'megacode-2',
+    title: 'Megacode 2: Taquicardia Instável, Protocolo OSASCO e FV de Degeneração',
+    category: 'megacode',
+    description: 'Estudo prático da aplicação do protocolo OSASCO na cardioversão, complicação com fibrilação ventricular e ressuscitação.',
+    briefing: {
+      setting: 'Unidade de Pronto Atendimento - Sala de Emergência',
+      patientDescription: 'Mulher, 52 anos, procurou atendimento com queixa de taquicardia há 2 horas, aperto retroesternal e mal-estar súbito.',
+      initialComplaint: '"Meu coração vai sair pela boca, sinto falta de ar e dor forte no peito..."',
+      vitalSignsSummary: 'FC 180 bpm | PA 80/50 mmHg | SpO2 89% | FR 28 rpm | Pálida, sudoreica, taquipneica.',
+    },
+    phases: [
+      {
+        id: 'mg2-p1',
+        phaseNumber: 1,
+        phaseName: 'Fase 1: Taquiarritmia com Critérios de Instabilidade',
+        narrative: 'Paciente em leito de emergência. Você realiza o MOVE de imediato: coloca oxigênio sob cateter, instala monitorização contínua e obtém acesso venoso calibroso. O monitor mostra complexos estreitos regulares a 180 bpm sem onda P visível. A pressão arterial é 80/50 mmHg com queixa de dor torácica anginosa e dispneia.',
+        vitals: {
+          heartRate: 180,
+          systolicBP: 80,
+          diastolicBP: 50,
+          spO2: 89,
+          respiratoryRate: 28,
+          etCO2: 34,
+          consciousness: 'alert',
+          hasPulse: true,
+          chestPain: true,
+          dyspnea: true,
+          shockSigns: true,
+        },
+        rhythm: 'tsv',
+        question: {
+          id: 'q-mg2-p1',
+          title: 'Classificação e Conduta Inicial na Taquicardia',
+          question: 'O paciente apresenta taquicardia a 180 bpm com dor no peito, dispneia e PAS < 90 mmHg. Qual a classificação e conduta prioritária indicada pelos slides?',
+          options: [
+            {
+              id: 'a',
+              text: 'Taquicardia ESTÁVEL; realizar Manobra de Valsalva Modificada e prescrever beta-bloqueador oral.',
+              isCorrect: false,
+              feedback: 'Incorreto. A presença de PAS < 90 mmHg, dor torácica e sinais de choque define o paciente como INSTÁVEL.',
+            },
+            {
+              id: 'b',
+              text: 'Taquicardia INSTÁVEL com pulso; a conduta de escolha é a Cardioversão Elétrica Sincronizada (CVE 100J) seguindo o protocolo OSASCO.',
+              isCorrect: true,
+              feedback: 'Exato! Taquicardias com critérios de instabilidade hemodinâmica (PAS < 90, dor torácica, choque, dispneia) requerem Cardioversão Elétrica Sincronizada imediata (100J) precedida pelo protocolo OSASCO.',
+            },
+            {
+              id: 'c',
+              text: 'Desfibrilação imediata com 200 Joules sem sincronização.',
+              isCorrect: false,
+              feedback: 'Incorreto! Paciente tem pulso! O choque não sincronizado pode incidir na onda T (período vulnerável da repolarização ventricular) e deflagrar uma Fibrilação Ventricular letal.',
+            },
+            {
+              id: 'd',
+              text: 'Aguardar exames laboratoriais e enzimas cardíacas antes de qualquer conduta terapêutica.',
+              isCorrect: false,
+              feedback: 'Incorreto. Em paciente instável com risco iminente de colapso circulatório, a intervenção elétrica não pode ser postergada.',
+            },
+          ],
+          explanation: 'Diante de taquicardia com critérios de instabilidade (PAS < 90, dor torácica, choque, dispneia, RNC), a conduta mandatória é Cardioversão Elétrica Sincronizada (CVE) a 100 Joules. Deve-se aplicar o protocolo OSASCO.',
+        },
+        targetActionHint: 'Execute as etapas do protocolo OSASCO (Orientar, Sedar, Ambusar, Sincronizar no TEC-5600, Chocar 100J e Checar pulso/ritmo)!',
+      },
+      {
+        id: 'mg2-p2',
+        phaseNumber: 2,
+        phaseName: 'Fase 2: Fibrilação Ventricular (FV) Pós-Choque',
+        narrative: 'Após o disparo do choque, o paciente perde o pulso e o monitor passa a registrar ondulações caóticas, irregulares e de voltagem variável: Fibrilação Ventricular (FV).',
+        vitals: {
+          heartRate: 0,
+          systolicBP: 0,
+          diastolicBP: 0,
+          spO2: 60,
+          respiratoryRate: 0,
+          etCO2: 8,
+          consciousness: 'unresponsive',
+          hasPulse: false,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: true,
+        },
+        rhythm: 'fv_grosseira',
+        question: {
+          id: 'q-mg2-p2',
+          title: 'Ritmo Chocável de PCR - Manejo da FV',
+          question: 'O paciente colapsou em Fibrilação Ventricular. Qual é a conduta sequencial correta no cardioversor e na equipe de ressuscitação?',
+          options: [
+            {
+              id: 'a',
+              text: 'Desativar a sincronização (SINC OFF), selecionar carga de 200J bifásica, aplicar Desfibrilação imediata e reiniciar a RCP por 2 minutos.',
+              isCorrect: true,
+              feedback: 'Perfeito! Em FV, a desfibrilação NÃO é sincronizada. Carga máxima recomendada (200J bifásico). Reiniciar RCP imediatamente por 2 min logo após o choque.',
+            },
+            {
+              id: 'b',
+              text: 'Administrar Epinefrina 1 mg e Amiodarona 300 mg antes de aplicar qualquer choque.',
+              isCorrect: false,
+              feedback: 'Incorreto. Em FV/TVSP, drogas só entram após o segundo e terceiro ciclos com choques. A desfibrilação precoce é a prioridade número 1.',
+            },
+            {
+              id: 'c',
+              text: 'Palpar o pulso por 1 minuto imediatamente após o choque antes de reiniciar as compressões.',
+              isCorrect: false,
+              feedback: 'Incorreto! Não se checa pulso logo após o choque em PCR. Reinicia-se a massagem imediatamente para manter a perfusão coronária.',
+            },
+            {
+              id: 'd',
+              text: 'Aplicar o protocolo CAGADA para verificar linha de base.',
+              isCorrect: false,
+              feedback: 'Incorreto. Protocolo CAGADA é exclusivo da Assistolia.',
+            },
+          ],
+          explanation: 'FV é ritmo de parada chocável. A prioridade máxima é a desfibrilação precoce não sincronizada a 200J bifásico, com retorno imediato à RCP por 2 minutos.',
+        },
+        targetActionHint: 'No TEC-5600: verifique que SINC está DESLIGADO, selecione 200J, aperte CARGA e dispare o CHOQUE!',
+      },
+      {
+        id: 'mg2-p3',
+        phaseNumber: 3,
+        phaseName: 'Fase 3: 3º Ciclo Chocável - Droga Antiarrítmica e Reversão',
+        narrative: 'Persistindo em FV após o segundo choque e administração de Epinefrina 1 mg, chega o momento da medicação antiarrítmica indicada no 3º ciclo do algoritmo de parada.',
+        vitals: {
+          heartRate: 0,
+          systolicBP: 0,
+          diastolicBP: 0,
+          spO2: 62,
+          respiratoryRate: 0,
+          etCO2: 14,
+          consciousness: 'unresponsive',
+          hasPulse: false,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: true,
+        },
+        rhythm: 'fv_grosseira',
+        question: {
+          id: 'q-mg2-p3',
+          title: 'Medicação Antiarrítmica no Algoritmo de PCR',
+          question: 'No terceiro choque de um ritmo chocável refratário (FV/TV sem pulso), qual droga antiarrítmica e respectiva dose de ataque está indicada no algoritmo?',
+          options: [
+            {
+              id: 'a',
+              text: 'Atropina 1 mg em bolus rápido.',
+              isCorrect: false,
+              feedback: 'Incorreto. A Atropina foi removida das diretrizes de PCR e não tem ação em FV/TV.',
+            },
+            {
+              id: 'b',
+              text: 'Amiodarona 300 mg em bolus EV/IO (ou Lidocaína 1 a 1,5 mg/kg).',
+              isCorrect: true,
+              feedback: 'Correto! Conforme os slides e o algoritmo da AHA, a 1ª dose de Amiodarona é de 300 mg em bolus após o 3º choque. A 2ª dose (150 mg) pode ser feita nos ciclos subsequentes.',
+            },
+            {
+              id: 'c',
+              text: 'Adenosina 6 mg em bolus rápido com flush.',
+              isCorrect: false,
+              feedback: 'Incorreto. A Adenosina é utilizada em taquicardias supraventriculares com pulso, nunca em PCR.',
+            },
+            {
+              id: 'd',
+              text: 'Dopamina em infusão contínua a 20 mcg/kg/min.',
+              isCorrect: false,
+              feedback: 'Incorreto. Dopamina não é indicada como antiarrítmico em PCR.',
+            },
+          ],
+          explanation: 'Drogas em PCR Chocável: Epinefrina 1 mg entra após o 2º choque (a cada 3-5 min); Amiodarona 300 mg entra após o 3º choque (podendo repetir 150 mg se refratária).',
+        },
+      },
+    ],
+  },
+
+  // ==========================================
+  // CASO FOCADO 1: BAVT Instável & Marca-passo Transcutâneo TEC-5600
+  // ==========================================
+  {
+    id: 'focado-bavt-mp',
+    title: 'Estação Prática: BAVT Instável e Operação do Marca-passo TEC-5600',
+    category: 'bradi',
+    description: 'Treinamento focado nos controles do painel de marca-passo transcutâneo do Nihon Kohden TEC-5600: ajuste de ppm, mA e analgesia.',
+    briefing: {
+      setting: 'Box de Emergência - Estação OSCE com Manequim de Alta Fidelidade',
+      patientDescription: 'Homem, 74 anos, com queixa de síncope ao esforço há 30 minutos. Encontrado lúcido porém com pele fria e hipotenso.',
+      initialComplaint: '"Apaguei do nada quando fui ao banheiro... sinto fraqueza extrema."',
+      vitalSignsSummary: 'FC 36 bpm | PA 78/48 mmHg | SpO2 93% | Tempo de enchimento capilar 4 segundos.',
+    },
+    phases: [
+      {
+        id: 'bavt-p1',
+        phaseNumber: 1,
+        phaseName: 'Ajuste e Titulação do Marca-passo Transcutâneo',
+        narrative: 'O monitor exibe ondas P sem relação fixa com os complexos QRS (BAVT) a 36 bpm. O paciente apresenta PAS < 90 mmHg e perfusão periférica lentificada. Você já realizou MOVE. Como se trata de BAVT, a Atropina não irá responder.',
+        vitals: {
+          heartRate: 36,
+          systolicBP: 78,
+          diastolicBP: 48,
+          spO2: 93,
+          respiratoryRate: 20,
+          etCO2: 32,
+          consciousness: 'alert',
+          hasPulse: true,
+          chestPain: false,
+          dyspnea: true,
+          shockSigns: true,
+        },
+        rhythm: 'bav_3_bavt',
+        pacerThresholdMA: 70,
+        question: {
+          id: 'q-bavt-p1',
+          title: 'Etapas de Instalação do Marca-passo Transcutâneo',
+          question: 'De acordo com os slides de aula prática, qual é a sequência correta de operação do marca-passo no cardioversor Nihon Kohden TEC-5600?',
+          options: [
+            {
+              id: 'a',
+              text: 'Colocar pás adesivas multifunção -> Colocar seletor na função MP -> Ajustar a FC de estimulação (60-80 ppm) -> Iniciar com menor corrente (mA) e subir até haver captura elétrica/mecânica -> Prescrever analgesia/sedação.',
+              isCorrect: true,
+              feedback: 'Excelente! Exatamente o passo a passo dos slides da UNISA (páginas 10-12): posicionar pás, mudar para MP, ajustar FC, titular mA até captura e analgesiar com opioide devido à dor muscular.',
+            },
+            {
+              id: 'b',
+              text: 'Disparar choque não sincronizado de 200 Joules para estimular o nó atrioventricular.',
+              isCorrect: false,
+              feedback: 'Incorreto! Desfibrilação é para PCR chocável, não para bradicardia com pulso.',
+            },
+            {
+              id: 'c',
+              text: 'Iniciar com corrente máxima de 200 mA imediatamente sem necessidade de analgesia ou ajuste de frequência.',
+              isCorrect: false,
+              feedback: 'Incorreto. A estimulação súbita em 200 mA causa intensa dor e queimaduras cutâneas desnecessárias. Deve-se titular a partir de valores menores até o limiar de captura.',
+            },
+            {
+              id: 'd',
+              text: 'Aguardar 24 horas antes de indicar estimulação cardíaca artificial.',
+              isCorrect: false,
+              feedback: 'Incorreto. Em paciente instável com BAVT, a intervenção imediata evita parada em assistolia.',
+            },
+          ],
+          explanation: 'Passo a passo do MP Transcutâneo: 1) Pás adesivas no tórax; 2) Seletor em MP (Fixo ou Demanda); 3) Ajustar FC (ex: 70 ppm); 4) Iniciar estimulação e subir a corrente mA até a espícula ser seguida por QRS e onda T (captura elétrica) com checagem de pulso (captura mecânica); 5) Analgesia/sedação (ex: morfina) se consciente.',
+        },
+        targetActionHint: 'No TEC-5600: gire o seletor para MP, ajuste ppm para 70, aperte INICIAR e suba a corrente (mA) até 70 mA para obter captura!',
+      },
+    ],
+  },
+
+  // ==========================================
+  // CASO FOCADO 2: TPSV Estável & Valsalva Modificada / Adenosina
+  // ==========================================
+  {
+    id: 'focado-tpsv-estavel',
+    title: 'Estação Prática: Taquicardia Supraventricular Estável (Valsalva e Adenosina)',
+    category: 'taqui',
+    description: 'Raciocínio para taquicardias regulares de complexo estreito sem sinais de instabilidade: Manobra de Valsalva Modificada em 3 tempos e técnica de bolus de Adenosina.',
+    briefing: {
+      setting: 'Ambulatório de Especialidades / Sala de Triagem',
+      patientDescription: 'Mulher, 27 anos, sem comorbidades prévias, refere início súbito de palpitações rápidas no peito há 40 minutos enquanto estudava.',
+      initialComplaint: '"Senti um disparo no peito do nada, mas não estou com dor e não sinto tontura."',
+      vitalSignsSummary: 'FC 195 bpm | PA 125/80 mmHg | SpO2 98% em ar ambiente | Consciente, orientada, corada e perfundida.',
+    },
+    phases: [
+      {
+        id: 'tpsv-p1',
+        phaseNumber: 1,
+        phaseName: 'Fase 1: Avaliação de Estabilidade e Manobra Vagal',
+        narrative: 'Paciente alerta, orientada, sem dor torácica, sem dispneia e com PAS 125 mmHg (estável!). Traçado no monitor mostra taquicardia regular com complexos QRS estreitos (< 120 ms) a 195 bpm sem onda P distinguível (TPSV).',
+        vitals: {
+          heartRate: 195,
+          systolicBP: 125,
+          diastolicBP: 80,
+          spO2: 98,
+          respiratoryRate: 18,
+          etCO2: 38,
+          consciousness: 'alert',
+          hasPulse: true,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: false,
+        },
+        rhythm: 'tsv',
+        question: {
+          id: 'q-tpsv-p1',
+          title: 'Conduta Inicial na Taquicardia de QRS Estreito Estável',
+          question: 'Em uma taquicardia regular de QRS estreito hemodinamicamente ESTÁVEL, qual a primeira conduta terapêutica indicada nos slides antes de administrar medicamentos?',
+          options: [
+            {
+              id: 'a',
+              text: 'Cardioversão Elétrica Sincronizada imediata com 100 Joules.',
+              isCorrect: false,
+              feedback: 'Incorreto. A CVE é reservada para pacientes INSTÁVEIS. Em pacientes estáveis, tenta-se primeiramente medidas não invasivas e farmacológicas.',
+            },
+            {
+              id: 'b',
+              text: 'Manobra de Valsalva Modificada (soprar êmbolo de seringa 15s -> deitar com elevação de membros inferiores a 45º por 15s -> sentar por 30s).',
+              isCorrect: true,
+              feedback: 'Perfeito! Exatamente o método demonstrado no slide 17 da aula. A Manobra de Valsalva Modificada tem taxa de sucesso comprovada superior a 40% na reversão de TPSV.',
+            },
+            {
+              id: 'c',
+              text: 'Desfibrilação com pás de 200 Joules.',
+              isCorrect: false,
+              feedback: 'Incorreto. Desfibrilação é para PCR em ritmo chocável!',
+            },
+            {
+              id: 'd',
+              text: 'Administrar Epinefrina 1 mg em bolus intravenoso.',
+              isCorrect: false,
+              feedback: 'Incorreto. A Epinefrina é um agonista adrenérgico potente que pioraria drasticamente a taquicardia.',
+            },
+          ],
+          explanation: 'Para taquicardias regulares de complexo estreito estáveis, a primeira linha é a Manobra Vagal, com destaque para a Manobra de Valsalva Modificada (15s expiração forçada + 15s elevação passiva de pernas a 45º + 30s sentado). Se não reverter, indica-se Adenosina.',
+        },
+      },
+      {
+        id: 'tpsv-p2',
+        phaseNumber: 2,
+        phaseName: 'Fase 2: Falha da Valsalva - Farmacoterapia de Escolha',
+        narrative: 'Após a execução correta da Manobra de Valsalva Modificada, o ritmo mantém-se inalterado a 195 bpm. O paciente continua estável.',
+        vitals: {
+          heartRate: 195,
+          systolicBP: 122,
+          diastolicBP: 78,
+          spO2: 98,
+          respiratoryRate: 18,
+          etCO2: 38,
+          consciousness: 'alert',
+          hasPulse: true,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: false,
+        },
+        rhythm: 'tsv',
+        question: {
+          id: 'q-tpsv-p2',
+          title: 'Droga de Escolha e Posologia na TPSV Estável',
+          question: 'Persistindo a taquicardia supraventricular estável após a manobra vagal, qual droga e modo de infusão estão indicados?',
+          options: [
+            {
+              id: 'a',
+              text: 'Adenosina 6 mg em bolus intravenoso rápido (1 a 2 segundos) seguido de flush imediato de 20 mL de SF 0,9% e elevação do membro.',
+              isCorrect: true,
+              feedback: 'Correto! Devido à meia-vida ultracurta da adenosina (< 10 segundos), a administração deve ser em bolus em torneirinha ("two-way") seguida imediatamente do flush de soro. Se não reverter, pode-se repetir 12 mg até 2 vezes.',
+            },
+            {
+              id: 'b',
+              text: 'Amiodarona 300 mg em infusão lenta de 24 horas.',
+              isCorrect: false,
+              feedback: 'Incorreto. Na taquicardia regular de QRS estreito a droga de primeira escolha é a Adenosina. Amiodarona é usada em taquicardias ventriculares ou ritmos de complexo largo.',
+            },
+            {
+              id: 'c',
+              text: 'Atropina 0,5 mg em bolus lento.',
+              isCorrect: false,
+              feedback: 'Incorreto. Atropina é um vagolítico que acelera a frequência cardíaca (usada em bradicardias).',
+            },
+            {
+              id: 'd',
+              text: 'Lidocaína 100 mg subcutânea.',
+              isCorrect: false,
+              feedback: 'Incorreto. Via inadequada e droga não indicada para taquicardia supraventricular.',
+            },
+          ],
+          explanation: 'Adenosina 6 mg EV rápido + flush de 20 mL de SF 0,9%. Se não houver reversão em 1-2 minutos, administra-se uma segunda dose de 12 mg EV rápido (e uma terceira de 12 mg se necessário). Se falhar: Beta-bloqueador ou Bloqueador de Canal de Cálcio.',
+        },
+      },
+    ],
+  },
+
+  // ==========================================
+  // CASO FOCADO 3: PCR em Assistolia Primária (Protocolo CAGADA)
+  // ==========================================
+  {
+    id: 'focado-assistolia-cagada',
+    title: 'Estação Prática: Assistolia e Protocolo CAGADA',
+    category: 'pcr',
+    description: 'Protocolo de confirmação obrigatória de linha isoelétrica na OSCE antes de diagnosticar assistolia (Cabos, Ganho, Derivação).',
+    briefing: {
+      setting: 'Pronto-Socorro - Enfermaria de Observação',
+      patientDescription: 'Homem, 61 anos, internado por sepse de foco pulmonar. A equipe de enfermagem chama o médico porque o paciente não responde.',
+      initialComplaint: 'Paciente inconsciente, sem expansão torácica e sem movimentos.',
+      vitalSignsSummary: 'Inconsciente | Sem pulso carotídeo | Traçado plano isoelétrico no monitor.',
+    },
+    phases: [
+      {
+        id: 'ass-p1',
+        phaseNumber: 1,
+        phaseName: 'Linha Reta no Monitor: Confirmação pelo Protocolo CAGADA',
+        narrative: 'Você chega ao leito, confirma a inconsciência, solicita ajuda imediata com carrinho de parada e checa pulso carotídeo e respiração simultaneamente por 10 segundos: ausentes! O monitor exibe uma linha reta horizontal. Antes de assumir que é assistolia real e não uma FV fina ou artefato técnico:',
+        vitals: {
+          heartRate: 0,
+          systolicBP: 0,
+          diastolicBP: 0,
+          spO2: 0,
+          respiratoryRate: 0,
+          etCO2: 6,
+          consciousness: 'unresponsive',
+          hasPulse: false,
+          chestPain: false,
+          dyspnea: false,
+          shockSigns: true,
+        },
+        rhythm: 'assistolia',
+        question: {
+          id: 'q-ass-p1',
+          title: 'Protocolo Obrigatório na Linha Reta',
+          question: 'Qual é o mnemônico e as ações obrigatórias que devem ser executadas no monitor para confirmar uma assistolia verdadeira?',
+          options: [
+            {
+              id: 'a',
+              text: 'Protocolo OSASCO (Orientar, Sedar, Ambusar, Sincronizar, Cardioverter, Observar).',
+              isCorrect: false,
+              feedback: 'Incorreto. OSASCO é para Cardioversão Elétrica em taquicardias com pulso.',
+            },
+            {
+              id: 'b',
+              text: 'Protocolo CAGADA: Checar CA-bos e eletrodos no tórax, GA-nho (aumentar para x2 ou máximo) e DA-erivação trocada (mudar de DII para DI ou DIII).',
+              isCorrect: true,
+              feedback: 'Correto! Conforme o slide 18 da aula prática, o protocolo CAGADA previne o erro de não chocar uma Fibrilação Ventricular fina ou de conduzir PCR por simples cabo desconectado.',
+            },
+            {
+              id: 'c',
+              text: 'Desfibrilação empírica com 200 Joules para ver se o coração responde.',
+              isCorrect: false,
+              feedback: 'ERRO GRAVE: Assistolia NÃO É RITMO CHOCÁVEL! Aplicar choque na assistolia queima o miocárdio e anula qualquer chance de retorno da atividade marcapasso.',
+            },
+            {
+              id: 'd',
+              text: 'Declarar o óbito imediatamente sem iniciar manobras de reanimação.',
+              isCorrect: false,
+              feedback: 'Incorreto. Em ambiente hospitalar com PCR recente, o suporte avançado de vida deve ser instituído prontamente.',
+            },
+          ],
+          explanation: 'Protocolo CAGADA: CAbos checados (conexão nos eletrodos e no aparelho), GAnho aumentado (para descartar FV de baixa amplitude/fina) e Derivação trocada (avaliar outro eixo elétrico). Confirmada a assistolia, mantém-se RCP contínua + Epinefrina 1 mg de imediato.',
+        },
+      },
+    ],
+  },
+];
+
+/**
+ * Random dynamic scenario generator for infinite OSCE practice
+ */
+export function generateRandomScenario(): ClinicalScenario {
+  const patientTypes = [
+    { name: 'Sr. Antônio', age: 67, gender: 'masculino', history: 'cardiopata prévio com infarto antigo' },
+    { name: 'Dona Maria', age: 72, gender: 'feminino', history: 'hipertensa em uso de betabloqueador' },
+    { name: 'Carlos', age: 34, gender: 'masculino', history: 'sem histórico prévio, usuário de energético' },
+    { name: 'Helena', age: 58, gender: 'feminino', history: 'diabética e tabagista de longa data' },
+  ];
+
+  const rhythmPool = [
+    {
+      rhythm: 'tsv' as const,
+      name: 'Taquicardia Supraventricular Instável',
+      fc: 185,
+      pas: 82,
+      pad: 54,
+      spo2: 91,
+      unstable: true,
+      correctAction: 'b',
+      targetEnergy: 100,
+    },
+    {
+      rhythm: 'fa_alta_resposta' as const,
+      name: 'Fibrilação Atrial de Alta Resposta Instável',
+      fc: 165,
+      pas: 85,
+      pad: 50,
+      spo2: 90,
+      unstable: true,
+      correctAction: 'b',
+      targetEnergy: 150,
+    },
+    {
+      rhythm: 'bav_3_bavt' as const,
+      name: 'BAVT com Baixo Débito Cardíaco',
+      fc: 34,
+      pas: 72,
+      pad: 42,
+      spo2: 92,
+      unstable: true,
+      correctAction: 'c',
+      targetEnergy: 0,
+    },
+    {
+      rhythm: 'fv_grosseira' as const,
+      name: 'Parada Cardiorrespiratória em FV',
+      fc: 0,
+      pas: 0,
+      pad: 0,
+      spo2: 50,
+      unstable: true,
+      correctAction: 'a',
+      targetEnergy: 200,
+    },
+  ];
+
+  const randomPatient = patientTypes[Math.floor(Math.random() * patientTypes.length)];
+  const randomRhythm = rhythmPool[Math.floor(Math.random() * rhythmPool.length)];
+  const id = `random-${Date.now()}`;
+
+  const phase: ScenarioPhase = {
+    id: `${id}-p1`,
+    phaseNumber: 1,
+    phaseName: `Caso Aleatório: ${randomRhythm.name}`,
+    narrative: `Paciente ${randomPatient.name}, ${randomPatient.age} anos, dá entrada com queixa de mal-estar súbito e tontura. Ao exame físico e monitorização contínua (MOVE), constata-se FC de ${randomRhythm.fc} bpm e PA de ${randomRhythm.pas}/${randomRhythm.pad} mmHg.`,
+    vitals: {
+      heartRate: randomRhythm.fc,
+      systolicBP: randomRhythm.pas,
+      diastolicBP: randomRhythm.pad,
+      spO2: randomRhythm.spo2,
+      respiratoryRate: randomRhythm.pas === 0 ? 0 : 26,
+      etCO2: randomRhythm.pas === 0 ? 10 : 35,
+      consciousness: randomRhythm.pas === 0 ? 'unresponsive' : 'somnolent',
+      hasPulse: randomRhythm.pas > 0,
+      chestPain: randomRhythm.pas > 0,
+      dyspnea: randomRhythm.pas > 0,
+      shockSigns: true,
+    },
+    rhythm: randomRhythm.rhythm,
+    pacerThresholdMA: 65,
+    question: {
+      id: `${id}-q1`,
+      title: 'Identificação e Conduta Prioritária',
+      question: `Analise o traçado eletrocardiográfico e os sinais vitais (PA ${randomRhythm.pas}/${randomRhythm.pad} mmHg). Qual é a conduta prioritária imediata?`,
+      options: [
+        {
+          id: 'a',
+          text: randomRhythm.pas === 0 ? 'Desfibrilação imediata 200J (não sincronizada) + RCP' : 'Desfibrilar sem pulso',
+          isCorrect: randomRhythm.pas === 0,
+          feedback: randomRhythm.pas === 0 ? 'Correto! Ritmo de PCR chocável.' : 'Incorreto. Paciente tem pulso!',
+        },
+        {
+          id: 'b',
+          text: 'Cardioversão Elétrica Sincronizada (Protocolo OSASCO).',
+          isCorrect: randomRhythm.pas > 0 && randomRhythm.rhythm !== 'bav_3_bavt',
+          feedback: 'Correto para taquicardia instável com pulso!',
+        },
+        {
+          id: 'c',
+          text: 'Marca-passo transcutâneo (ou Droga Vasoativa), pois Atropina não é eficaz no BAVT.',
+          isCorrect: randomRhythm.rhythm === 'bav_3_bavt',
+          feedback: 'Correto para BAVT com instabilidade hemodinâmica!',
+        },
+        {
+          id: 'd',
+          text: 'Alta ambulatorial com encaminhamento à cardiologia.',
+          isCorrect: false,
+          feedback: 'Incorreto. Trata-se de uma emergência clínica crítica.',
+        },
+      ],
+      explanation: 'Avaliação sistemática: 1) Determinar pulso; 2) Estável ou Instável?; 3) Conduta elétrica ou farmacológica imediata.',
+    },
+  };
+
+  return {
+    id,
+    title: `Simulação Aleatória: ${randomPatient.name} (${randomRhythm.name})`,
+    category: 'pcr',
+    description: `Cenário gerado com base em paciente de ${randomPatient.age} anos, história de ${randomPatient.history}.`,
+    briefing: {
+      setting: 'Pronto-Socorro Adulto - Sala de Emergência',
+      patientDescription: `${randomPatient.name}, ${randomPatient.age} anos, histórico de ${randomPatient.history}.`,
+      initialComplaint: 'Mal-estar súbito, tontura e palpitações intensas.',
+      vitalSignsSummary: `FC ${randomRhythm.fc} | PA ${randomRhythm.pas}/${randomRhythm.pad} mmHg | SpO2 ${randomRhythm.spo2}%`,
+    },
+    phases: [phase],
+  };
+}
